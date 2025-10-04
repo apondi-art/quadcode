@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -32,6 +33,9 @@ const MONTHS = [
 ];
 
 export default function DayOfYearPicker({ dayOfYear, onDayOfYearChange }: DayOfYearPickerProps) {
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = React.useState(currentYear + 1);
+
   const currentMonth = MONTHS.find((m) => m.value === dayOfYear.month) || MONTHS[0];
   const maxDays = currentMonth.days;
 
@@ -47,8 +51,27 @@ export default function DayOfYearPicker({ dayOfYear, onDayOfYearChange }: DayOfY
     onDayOfYearChange({ ...dayOfYear, day: value[0] });
   };
 
+  // Generate years (current year + 10 years)
+  const years = Array.from({ length: 11 }, (_, i) => currentYear + i);
+
   return (
     <div className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="year-select">Year</Label>
+        <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+          <SelectTrigger id="year-select">
+            <SelectValue placeholder="Select year" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={year.toString()}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="month-select">Month</Label>
         <Select value={dayOfYear.month.toString()} onValueChange={handleMonthChange}>
@@ -87,7 +110,7 @@ export default function DayOfYearPicker({ dayOfYear, onDayOfYearChange }: DayOfY
 
       <div className="p-3 bg-muted rounded-md text-center">
         <p className="text-sm font-medium">
-          Selected Date: {currentMonth.label} {dayOfYear.day}
+          Selected Date: {currentMonth.label} {dayOfYear.day}, {selectedYear}
         </p>
       </div>
     </div>
