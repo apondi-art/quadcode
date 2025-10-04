@@ -5,7 +5,7 @@ import LocationSelector from '@/components/LocationSelector';
 import DayOfYearPicker from '@/components/DayOfYearPicker';
 import VariableSelector from '@/components/VariableSelector';
 import ThresholdSettings from '@/components/ThresholdSettings';
-import ResultsPanel from '@/components/ResultsPanel';
+import ResultsVisualization from '@/components/ResultsVisualization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -58,7 +58,6 @@ export default function Home() {
         variables: selectedVariables,
         thresholds,
       });
-
       setResults(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch weather data');
@@ -198,7 +197,7 @@ export default function Home() {
 
           {/* Results Panel - Right Section */}
           <section>
-            <ResultsPanel loading={loading} />
+            <ResultsVisualization data={results} loading={loading} />
           </section>
         </div>
       </main>
