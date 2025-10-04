@@ -1,0 +1,25 @@
+[project]
+name = "earthdata-test"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "HilaryOkello",email = "hilaryokello091@gmail.com"}
+]
+requires-python = ">=3.8,<4.0"
+dependencies = [
+    "earthaccess",
+    "xarray",
+    "numpy",
+    "matplotlib",
+    "cartopy",
+    "netCDF4",
+    "h5netcdf",
+    "dask",
+    "pandas",
+    "rioxarray",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
