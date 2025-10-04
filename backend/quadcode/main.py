@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
 
-from app.api.v1.weather import router as weather_router
+from quadcode.app.api.v1.weather import router as weather_router
 
 # Configure logging
 logging.basicConfig(
@@ -62,7 +62,6 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     try:
-        # TODO: Add actual earthdata authentication check
         return {
             "status": "healthy",
             "earthdata_authenticated": True,

@@ -47,6 +47,9 @@ export interface Statistics {
   max: number;
   percentile_25: number;
   percentile_75: number;
+  percentile_10?: number;
+  percentile_90?: number;
+  count?: number;
 }
 
 export interface Probabilities {

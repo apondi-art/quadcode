@@ -8,7 +8,7 @@ from typing import Dict
 from calendar import month_name
 import logging
 
-from app.models.weather import (
+from quadcode.app.models.weather import (
     WeatherQueryRequest,
     WeatherQueryResponse,
     QueryInfo,
@@ -19,8 +19,8 @@ from app.models.weather import (
     Metadata,
     Location
 )
-from app.services.earthdata_service import EarthdataService, get_earthdata_service
-from app.core.utils import compute_statistics, compute_probabilities, compute_grid_offset
+from quadcode.app.services.earthdata_service import EarthdataService, get_earthdata_service
+from quadcode.app.core.utils import compute_statistics, compute_probabilities, compute_grid_offset
 
 logger = logging.getLogger(__name__)
 

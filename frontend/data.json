@@ -1,0 +1,92 @@
+{
+  "query_info": {
+    "requested_location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "actual_grid_points": {
+      "temperature": {
+        "lat": -0.5,
+        "lon": 36.875,
+        "dataset": "MERRA-2 M2SDNXSLV"
+      },
+      "precipitation": {
+        "lat": -0.45,
+        "lon": 36.95000076293945,
+        "dataset": "GPM IMERG v07"
+      }
+    },
+    "day_of_year": "April 15",
+    "years_analyzed": 1,
+    "data_period": "2024-2024",
+    "missing_data": null
+  },
+  "historical_data": {
+    "temperature": {
+      "values": [
+        16.527886962890648
+      ],
+      "years": [
+        2024
+      ],
+      "statistics": {
+        "mean": 16.527886962890648,
+        "median": 16.527886962890648,
+        "std": 0.0,
+        "min": 16.527886962890648,
+        "max": 16.527886962890648,
+        "percentile_10": 16.527886962890648,
+        "percentile_25": 16.527886962890648,
+        "percentile_75": 16.527886962890648,
+        "percentile_90": 16.527886962890648,
+        "count": 1
+      },
+      "probabilities": {
+        "above_35.0": 0.0,
+        "below_5.0": 0.0
+      }
+    },
+    "precipitation": {
+      "values": [
+        57.875
+      ],
+      "years": [
+        2024
+      ],
+      "statistics": {
+        "mean": 57.875,
+        "median": 57.875,
+        "std": 0.0,
+        "min": 57.875,
+        "max": 57.875,
+        "percentile_10": 57.875,
+        "percentile_25": 57.875,
+        "percentile_75": 57.875,
+        "percentile_90": 57.875,
+        "count": 1
+      },
+      "probabilities": {
+        "above_50.0": 1.0
+      }
+    }
+  },
+  "metadata": {
+    "data_sources": {
+      "temperature": {
+        "name": "MERRA-2 M2SDNXSLV v5.12.4",
+        "url": "https://disc.gsfc.nasa.gov/datasets/M2SDNXSLV_5.12.4/summary"
+      },
+      "precipitation": {
+        "name": "GPM IMERG Final v07",
+        "url": "https://gpm.nasa.gov/data/imerg"
+      }
+    },
+    "units": {
+      "temperature": "celsius",
+      "precipitation": "mm/day",
+      "wind_speed": "m/s",
+      "humidity": "percent"
+    }
+  }
+}
