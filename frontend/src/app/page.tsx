@@ -5,7 +5,7 @@ import LocationSelector from '@/components/LocationSelector';
 import DayOfYearPicker from '@/components/DayOfYearPicker';
 import VariableSelector from '@/components/VariableSelector';
 import ThresholdSettings from '@/components/ThresholdSettings';
-import ResultsVisualization from '@/components/ResultsVisualization';
+import ResultsPanel from '@/components/ResultsPanel';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -198,7 +198,7 @@ export default function Home() {
 
           {/* Results Panel - Right Section */}
           <section>
-            <ResultsVisualization data={results} loading={loading} />
+            <ResultsPanel loading={loading} />
           </section>
         </div>
       </main>
