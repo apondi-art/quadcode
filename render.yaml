@@ -4,7 +4,7 @@ services:
     name: quadcode-backend
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerContext: .
     plan: free
     envVars:
       - key: PYTHON_VERSION
@@ -26,7 +26,7 @@ services:
     name: quadcode-frontend
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
-    dockerContext: ./frontend
+    dockerContext: .
     plan: free
     envVars:
       - key: NODE_ENV
