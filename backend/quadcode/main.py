@@ -29,6 +29,7 @@ app = FastAPI(
 allowed_origins = [
     "http://localhost:3000",  # Local Next.js dev
     "http://localhost:5173",  # Local Vite dev
+    "https://*.onrender.com",  # Render deployments
 ]
 
 # Add production frontend URL if set
