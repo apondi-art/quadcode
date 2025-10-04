@@ -140,6 +140,132 @@ This will:
 
 If both scripts run successfully and generate CSV files, your setup is complete!
 
+## Running the API Server
+
+### Start the Server
+
+Run the FastAPI server:
+
+```bash
+poetry run python main.py
+```
+
+The server will start on `http://localhost:8000`
+
+- **API Documentation**: http://localhost:8000/docs (interactive Swagger UI)
+- **Alternative Docs**: http://localhost:8000/redoc
+- **Health Check**: http://localhost:8000/api/v1/health
+
+### Testing the API with curl
+
+#### 1. Health Check
+
+```bash
+curl http://localhost:8000/api/v1/health
+```
+
+#### 2. Query Temperature and Precipitation
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 4,
+      "day": 15
+    },
+    "historical_years": {
+      "start_year": 2024,
+      "end_year": 2024
+    },
+    "variables": ["temperature", "precipitation"],
+    "thresholds": {
+      "temperature": {"hot": 35, "cold": 5},
+      "precipitation": {"wet": 50}
+    }
+  }'
+```
+
+**Expected Response Time**: ~30-60 seconds
+
+#### 3. Query Wind Speed (slower)
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 8,
+      "day": 21
+    },
+    "historical_years": {
+      "start_year": 2024,
+      "end_year": 2024
+    },
+    "variables": ["wind_speed"],
+    "thresholds": {
+      "wind_speed": {"windy": 10}}
+  }'
+```
+
+**Expected Response Time**: ~2-3 minutes (uses hourly MERRA-2 dataset)
+
+#### 4. Query All Variables
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 4,
+      "day": 15
+    },
+    "historical_years": {
+      "start_year": 2022,
+      "end_year": 2024
+    },
+    "variables": ["temperature", "precipitation", "wind_speed", "humidity"],
+    "thresholds": {
+      "temperature": {"hot": 35, "cold": 5},
+      "precipitation": {"wet": 50},
+      "wind_speed": {"windy": 40},
+      "humidity": {"humid": 80}
+    }
+  }'
+```
+
+### API Response Format
+
+The API returns JSON with:
+- **query_info**: Requested location, actual grid points used, date range
+- **historical_data**: For each variable:
+  - `values`: Historical data values
+  - `years`: Corresponding years
+  - `statistics`: mean, median, std, min, max, percentiles
+  - `probabilities`: Based on provided thresholds
+- **metadata**: Data sources and units
+
+### Performance Notes
+
+- **Temperature & Precipitation**: Fast (~30-60 sec per year)
+- **Wind & Humidity**: Slower (~2-3 min per year) - uses hourly dataset with midday sampling
+- For faster queries, use shorter year ranges (e.g., 2022-2024 instead of 2000-2024)
+
 ### Troubleshooting
 
 **Authentication errors:**
