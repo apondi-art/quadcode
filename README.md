@@ -62,13 +62,25 @@ This will create a virtual environment and install all dependencies listed in `p
 
 ### 3. Configure NASA Earthdata Authentication
 
-To stream data from NASA Earthdata, you need to set up authentication credentials.
+To stream data from NASA Earthdata, you need to generate three prerequisite files that contain your authentication credentials. These files enable secure access to NASA Earth observation data archives.
 
-#### Option A: Using .netrc file (Recommended)
+#### What You'll Need
+- A NASA Earthdata Login account ([register here](https://urs.earthdata.nasa.gov/users/new))
+- Your Earthdata username and password
 
-Create a `.netrc` file in your home directory with your NASA Earthdata credentials:
+#### Required Files
 
-**Linux/macOS/WSL:**
+**`.netrc` File** - Contains your Earthdata Login credentials. Required for authentication with NASA Earthdata servers.
+
+**`.urs_cookies` File** - Stores authentication cookies for command-line tools (wget, curl).
+
+**`.dodsrc` File** - Contains file paths to .netrc and .urs_cookies files. Required for OPeNDAP server access.
+
+#### Setup Instructions
+
+##### Linux/macOS/WSL
+
+**1. Create .netrc file:**
 ```bash
 cat > ~/.netrc << EOF
 machine urs.earthdata.nasa.gov
@@ -78,34 +90,64 @@ EOF
 chmod 600 ~/.netrc
 ```
 
-**Windows:**
-Create a file named `_netrc` in `C:\Users\YourUsername\` with the following content:
+**2. Create .urs_cookies file:**
+```bash
+touch ~/.urs_cookies
+chmod 600 ~/.urs_cookies
+```
+
+**3. Create .dodsrc file:**
+```bash
+cat > ~/.dodsrc << EOF
+HTTP.NETRC=$HOME/.netrc
+HTTP.COOKIE.JAR=$HOME/.urs_cookies
+EOF
+```
+
+##### Windows
+
+**1. Create _netrc file:**
+
+Create a file named `_netrc` (note the underscore) in `C:\Users\YourUsername\` with the following content:
 ```
 machine urs.earthdata.nasa.gov
     login YOUR_USERNAME
     password YOUR_PASSWORD
 ```
 
-#### Option B: Using .urs_cookies file
-
-Alternatively, you can use a cookies file. Create `.urs_cookies` in your home directory:
-
-**Linux/macOS/WSL:**
-```bash
-touch ~/.urs_cookies
-chmod 600 ~/.urs_cookies
-```
-
-**Windows:**
+**2. Create .urs_cookies file:**
 ```powershell
 New-Item -Path "$env:USERPROFILE\.urs_cookies" -ItemType File
 ```
 
-**Note:** When using earthaccess for the first time, you can also authenticate interactively:
-```python
-import earthaccess
-earthaccess.login()  # Will prompt for credentials and save them
+**3. Create .dodsrc file:**
+
+Create a file named `.dodsrc` in both:
+- Your home directory: `C:\Users\YourUsername\.dodsrc`
+- Your current working directory (where you run the application)
+
+Content:
 ```
+HTTP.NETRC=C:\Users\YourUsername\_netrc
+HTTP.COOKIE.JAR=C:\Users\YourUsername\.urs_cookies
+```
+
+**Important for Windows users:** The `.dodsrc` file must be in both your home directory AND your current working directory.
+
+#### Alternative: Interactive Authentication
+
+For first-time setup, you can also authenticate interactively using Python:
+
+```bash
+poetry shell
+python -c "import earthaccess; earthaccess.login()"
+```
+
+This will prompt for your credentials and automatically generate the necessary files.
+
+#### Verify Authentication
+
+After creating the files, verify your setup works by running the test scripts (see section 4 below).
 
 ### 4. Verify Setup
 
@@ -139,6 +181,132 @@ This will:
 - Generate `nyeri_temperature_august_2024.csv`
 
 If both scripts run successfully and generate CSV files, your setup is complete!
+
+## Running the API Server
+
+### Start the Server
+
+Run the FastAPI server:
+
+```bash
+poetry run python main.py
+```
+
+The server will start on `http://localhost:8000`
+
+- **API Documentation**: http://localhost:8000/docs (interactive Swagger UI)
+- **Alternative Docs**: http://localhost:8000/redoc
+- **Health Check**: http://localhost:8000/api/v1/health
+
+### Testing the API with curl
+
+#### 1. Health Check
+
+```bash
+curl http://localhost:8000/api/v1/health
+```
+
+#### 2. Query Temperature and Precipitation
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 4,
+      "day": 15
+    },
+    "historical_years": {
+      "start_year": 2024,
+      "end_year": 2024
+    },
+    "variables": ["temperature", "precipitation"],
+    "thresholds": {
+      "temperature": {"hot": 35, "cold": 5},
+      "precipitation": {"wet": 50}
+    }
+  }'
+```
+
+**Expected Response Time**: ~30-60 seconds
+
+#### 3. Query Wind Speed (slower)
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 8,
+      "day": 21
+    },
+    "historical_years": {
+      "start_year": 2024,
+      "end_year": 2024
+    },
+    "variables": ["wind_speed"],
+    "thresholds": {
+      "wind_speed": {"windy": 10}}
+  }'
+```
+
+**Expected Response Time**: ~2-3 minutes (uses hourly MERRA-2 dataset)
+
+#### 4. Query All Variables
+
+```bash
+curl -X POST http://localhost:8000/api/v1/weather/query \
+  -H "Content-Type: application/json" \
+  -d '{
+    "location": {
+      "lat": -0.4197,
+      "lon": 36.9489,
+      "name": "Nyeri, Kenya"
+    },
+    "day_of_year": {
+      "month": 4,
+      "day": 15
+    },
+    "historical_years": {
+      "start_year": 2022,
+      "end_year": 2024
+    },
+    "variables": ["temperature", "precipitation", "wind_speed", "humidity"],
+    "thresholds": {
+      "temperature": {"hot": 35, "cold": 5},
+      "precipitation": {"wet": 50},
+      "wind_speed": {"windy": 40},
+      "humidity": {"humid": 80}
+    }
+  }'
+```
+
+### API Response Format
+
+The API returns JSON with:
+- **query_info**: Requested location, actual grid points used, date range
+- **historical_data**: For each variable:
+  - `values`: Historical data values
+  - `years`: Corresponding years
+  - `statistics`: mean, median, std, min, max, percentiles
+  - `probabilities`: Based on provided thresholds
+- **metadata**: Data sources and units
+
+### Performance Notes
+
+- **Temperature & Precipitation**: Fast (~30-60 sec per year)
+- **Wind & Humidity**: Slower (~2-3 min per year) - uses hourly dataset with midday sampling
+- For faster queries, use shorter year ranges (e.g., 2022-2024 instead of 2000-2024)
 
 ### Troubleshooting
 
