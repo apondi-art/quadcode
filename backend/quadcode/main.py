@@ -6,6 +6,7 @@ FastAPI application entry point for Weather Probability Dashboard
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import os
 
 from app.api.v1.weather import router as weather_router
 
@@ -24,10 +25,20 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS for React frontend
+# Configure CORS for frontend
+allowed_origins = [
+    "http://localhost:3000",  # Local Next.js dev
+    "http://localhost:5173",  # Local Vite dev
+]
+
+# Add production frontend URL if set
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
