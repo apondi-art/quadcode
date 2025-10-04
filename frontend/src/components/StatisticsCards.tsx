@@ -1,8 +1,14 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { WeatherQueryResponse } from '@/types/weather';
-import { TrendingUp, TrendingDown, Minus, AlertTriangle, MapPin } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, AlertTriangle, MapPin, Info } from 'lucide-react';
 
 interface StatisticsCardsProps {
   data: WeatherQueryResponse | null;
@@ -60,79 +66,112 @@ export default function StatisticsCards({ data }: StatisticsCardsProps) {
   const extremeProb = getExtremeWeatherProbability();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* Location Info Card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            Location Info
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
+    <TooltipProvider>
+      <>
+        {/* Location Info Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium flex items-center gap-2">
+              <MapPin className="h-3 w-3" />
+              Location
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <p className="text-sm font-medium truncate">
               {data.query_info.requested_location.name || 'Custom Location'}
             </p>
             <p className="text-xs text-muted-foreground">
-              {data.query_info.requested_location.lat.toFixed(4)}°,{' '}
-              {data.query_info.requested_location.lon.toFixed(4)}°
+              {data.query_info.years_analyzed} years
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Best Conditions Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium flex items-center gap-2">
+              Best Conditions
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-xs">
+                    Probability within 1 std dev of mean (±68% normal distribution).
+                    Typical, non-extreme weather likelihood.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{getBestConditionsProbability()}%</div>
+            <p className="text-xs text-muted-foreground">ideal conditions</p>
+          </CardContent>
+        </Card>
+
+        {/* Extreme Weather Alert Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium flex items-center gap-2">
+              {extremeProb > 20 && <AlertTriangle className="h-3 w-3 text-yellow-500" />}
+              Extreme Weather
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-xs">
+                    Max probability of exceeding thresholds.
+                    Based on historical extreme event frequency.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{extremeProb.toFixed(0)}%</div>
             <p className="text-xs text-muted-foreground">
-              {data.query_info.years_analyzed} years analyzed
+              {extremeProb > 20 ? 'High' : 'Low'} probability
             </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Best Conditions Card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">Best Conditions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-primary">{getBestConditionsProbability()}%</div>
-          <p className="text-xs text-muted-foreground mt-1">chance of ideal conditions</p>
-        </CardContent>
-      </Card>
-
-      {/* Extreme Weather Alert Card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            {extremeProb > 20 && <AlertTriangle className="h-4 w-4 text-yellow-500" />}
-            Extreme Weather
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold">{extremeProb.toFixed(0)}%</div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {extremeProb > 20 ? 'High probability' : 'Low probability'}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Historical Trend Card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">Historical Trend</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-2">
-            {trend.direction === 'up' && <TrendingUp className="h-6 w-6 text-red-500" />}
-            {trend.direction === 'down' && <TrendingDown className="h-6 w-6 text-blue-500" />}
-            {trend.direction === 'stable' && <Minus className="h-6 w-6 text-gray-500" />}
-            <span className="text-2xl font-bold">
-              {trend.direction === 'stable' ? 'Stable' : `${trend.value.toFixed(1)}%`}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">
-            {trend.direction === 'up' && 'Increasing trend'}
-            {trend.direction === 'down' && 'Decreasing trend'}
-            {trend.direction === 'stable' && 'No significant change'}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+        {/* Historical Trend Card */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xs font-medium flex items-center gap-2">
+              Historical Trend
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-xs">
+                    Percent change: recent 3 years vs older 3 years.
+                    Shows if conditions are increasing/decreasing.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              {trend.direction === 'up' && <TrendingUp className="h-5 w-5 text-red-500" />}
+              {trend.direction === 'down' && <TrendingDown className="h-5 w-5 text-blue-500" />}
+              {trend.direction === 'stable' && <Minus className="h-5 w-5 text-gray-500" />}
+              <span className="text-xl font-bold">
+                {trend.direction === 'stable' ? 'Stable' : `${trend.value.toFixed(1)}%`}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {trend.direction === 'up' && 'Increasing'}
+              {trend.direction === 'down' && 'Decreasing'}
+              {trend.direction === 'stable' && 'Stable'}
+            </p>
+          </CardContent>
+        </Card>
+      </>
+    </TooltipProvider>
   );
 }
