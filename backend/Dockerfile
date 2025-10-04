@@ -21,7 +21,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --no-cache-dir poetry==1.7.1
 
 # Copy Poetry files
-COPY pyproject.toml poetry.lock ./
+COPY backend/pyproject.toml backend/poetry.lock ./
 
 # Configure Poetry to not create a virtual environment
 RUN poetry config virtualenvs.create false
@@ -30,7 +30,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi --no-root --no-dev
 
 # Copy application code
-COPY . .
+COPY backend/ .
 
 # Install the package itself
 RUN poetry install --no-interaction --no-ansi --only-root
