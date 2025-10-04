@@ -1,5 +1,13 @@
-// Mock data generators for charts
+// Mock data from data.json
+import mockDataJson from '../../data.json';
+import { WeatherQueryResponse } from '@/types/weather';
 
+// Export the mock data as a typed response
+export const getMockWeatherData = (): WeatherQueryResponse => {
+  return mockDataJson as WeatherQueryResponse;
+};
+
+// Legacy generators for charts (kept for backward compatibility)
 export const generateProbabilityDistributionData = () => {
   const data = [];
   // Generate bell curve data
