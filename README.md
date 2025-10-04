@@ -1,4 +1,4 @@
-# Personalized Weather Likelihood Dashboard
+# Personalized Weather Dashboard
 
 This project was developed for the **2025 NASA Space Apps Challenge**.  
 It is a web application that helps users explore the **likelihood of extreme weather conditions** for a specific **location** and **time of year**, using historical NASA Earth observation data.
@@ -19,7 +19,7 @@ It is a web application that helps users explore the **likelihood of extreme wea
 - Download results in **JSON** or **CSV** format for further analysis.
 
 ##  Tech Stack
-- **Backend**: Python (Flask/FastAPI/Django REST) for API endpoints and data processing.
+- **Backend**: Python  for API endpoints and data processing.
 - **Frontend**: Interactive UI (React) for queries, graphs, and maps.
 - **Data**: NASA Earth observation datasets (temperature, precipitation, wind, humidity, etc.).
 
@@ -34,4 +34,4 @@ It is a web application that helps users explore the **likelihood of extreme wea
 
 ---
 
-🔗 Built for the NASA Space Apps Challenge 2025: *Exploring the world through open data*.
+ Built for the NASA Space Apps Challenge 2025: *Exploring the world through open data*.
