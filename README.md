@@ -27,10 +27,63 @@ It is a web application that helps users explore the **likelihood of extreme wea
 
 ### Prerequisites
 - Python 3.8 or higher
+- pyenv (Python version management tool)
 - Poetry (Python dependency management tool)
 - NASA Earthdata Login account ([register here](https://urs.earthdata.nasa.gov/users/new))
 
-### 1. Install Poetry
+### 1. Install pyenv
+
+pyenv allows you to manage multiple Python versions on your system.
+
+**Linux/macOS/WSL:**
+```bash
+curl https://pyenv.run | bash
+```
+
+Add pyenv to your shell configuration (`~/.bashrc`, `~/.zshrc`, or `~/.profile`):
+```bash
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+```
+
+Reload your shell:
+```bash
+source ~/.bashrc  # or source ~/.zshrc
+```
+
+**Windows:**
+Use [pyenv-win](https://github.com/pyenv-win/pyenv-win#installation):
+```powershell
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
+```
+
+Verify installation:
+```bash
+pyenv --version
+```
+
+### 2. Install and Set Python Version
+
+Install Python 3.10 (recommended for this project):
+```bash
+pyenv install 3.10
+```
+
+Set the local Python version for this project:
+```bash
+cd quadcode
+pyenv local 3.10
+```
+
+This creates a `.python-version` file that automatically activates Python 3.10 when you're in this directory.
+
+Verify:
+```bash
+python --version  # Should show Python 3.10.x
+```
+
+### 3. Install Poetry
 
 If you don't have Poetry installed, install it using one of these methods:
 
@@ -44,23 +97,51 @@ curl -sSL https://install.python-poetry.org | python3 -
 (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
 ```
 
-After installation, add Poetry to your PATH and verify:
+After installation, add Poetry to your PATH:
+```bash
+export PATH="/home/$USER/.local/bin:$PATH"  # Linux/macOS/WSL
+```
+
+Add this line to your `~/.bashrc` or `~/.zshrc` to make it permanent.
+
+Verify installation:
 ```bash
 poetry --version
 ```
 
-### 2. Install Dependencies
+### 4. Install Dependencies
 
 Clone the repository and install project dependencies:
 ```bash
 git clone https://github.com/apondi-art/quadcode.git
-cd quadcode
+cd quadcode/backend
 poetry install
 ```
 
 This will create a virtual environment and install all dependencies listed in `pyproject.toml`.
 
-### 3. Configure NASA Earthdata Authentication
+## Project Structure
+
+```
+quadcode/
+├── backend/
+│   ├── quadcode/              # Main Python package
+│   │   ├── app/              # FastAPI application
+│   │   │   ├── api/          # API endpoints
+│   │   │   ├── core/         # Core configuration
+│   │   │   ├── models/       # Data models
+│   │   │   └── services/     # Business logic
+│   │   ├── main.py           # Application entry point
+│   │   └── __init__.py
+│   ├── scripts/              # Utility scripts
+│   │   ├── test_earthdata.py
+│   │   └── temperature_nyeri.py
+│   ├── pyproject.toml        # Poetry dependencies
+│   └── poetry.lock
+└── README.md
+```
+
+### 5. Configure NASA Earthdata Authentication
 
 To stream data from NASA Earthdata, you need to generate three prerequisite files that contain your authentication credentials. These files enable secure access to NASA Earth observation data archives.
 
@@ -139,57 +220,22 @@ HTTP.COOKIE.JAR=C:\Users\YourUsername\.urs_cookies
 For first-time setup, you can also authenticate interactively using Python:
 
 ```bash
-poetry shell
-python -c "import earthaccess; earthaccess.login()"
+poetry run python -c "import earthaccess; earthaccess.login()"
 ```
 
 This will prompt for your credentials and automatically generate the necessary files.
 
 #### Verify Authentication
 
-After creating the files, verify your setup works by running the test scripts (see section 4 below).
+After creating the files, verify your setup works by starting the API server (see section 6 below).
 
-### 4. Verify Setup
+### 6. Start the API Server
 
-Run the test scripts to verify your setup is working correctly:
-
-**Activate the Poetry environment:**
-```bash
-poetry shell
-```
-
-**Test precipitation data streaming:**
-```bash
-python test_earthdata.py
-```
-
-This will:
-- Authenticate with NASA Earthdata
-- Search for GPM IMERG precipitation data for August 2024
-- Stream data for Nyeri, Kenya via OPeNDAP (no download required)
-- Generate `nyeri_precipitation_august_2024.csv`
-
-**Test temperature data streaming:**
-```bash
-python temperature_nyeri.py
-```
-
-This will:
-- Authenticate with NASA Earthdata
-- Search for MERRA-2 temperature data for August 2024
-- Stream data for Nyeri, Kenya via OPeNDAP
-- Generate `nyeri_temperature_august_2024.csv`
-
-If both scripts run successfully and generate CSV files, your setup is complete!
-
-## Running the API Server
-
-### Start the Server
-
-Run the FastAPI server:
+Navigate to the backend directory and run the FastAPI server:
 
 ```bash
-poetry run python main.py
+cd backend
+poetry run python quadcode/main.py
 ```
 
 The server will start on `http://localhost:8000`
@@ -198,7 +244,7 @@ The server will start on `http://localhost:8000`
 - **Alternative Docs**: http://localhost:8000/redoc
 - **Health Check**: http://localhost:8000/api/v1/health
 
-### Testing the API with curl
+## Testing the API with curl
 
 #### 1. Health Check
 
@@ -316,7 +362,7 @@ The API returns JSON with:
 - Try interactive login: `python -c "import earthaccess; earthaccess.login()"`
 
 **Module not found errors:**
-- Ensure you're in the Poetry virtual environment: `poetry shell`
+- Run commands with `poetry run` prefix
 - Reinstall dependencies: `poetry install`
 
 **Data access errors:**

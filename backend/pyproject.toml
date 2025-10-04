@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "quadcode"
+version = "0.1.0"
+description = ""
+authors = ["HilaryOkello <hilaryokello091@gmail.com>"]
+packages = [{include = "quadcode"}]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<4.0"
+earthaccess = "*"
+xarray = "*"
+numpy = "*"
+matplotlib = "*"
+cartopy = "*"
+netCDF4 = "*"
+h5netcdf = "*"
+dask = "*"
+pandas = "*"
+rioxarray = "*"
+fastapi = ">=0.104.0"
+uvicorn = {extras = ["standard"], version = ">=0.24.0"}
+pydantic = ">=2.0.0"
+python-multipart = ">=0.0.6"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
