@@ -14,13 +14,14 @@ from quadcode.app.models.weather import (
     QueryInfo,
     VariableData,
     Statistics,
+    TrendAnalysis,
     GridPoint,
     DataSource,
     Metadata,
     Location
 )
 from quadcode.app.services.earthdata_service import EarthdataService, get_earthdata_service
-from quadcode.app.core.utils import compute_statistics, compute_probabilities, compute_grid_offset
+from quadcode.app.core.utils import compute_statistics, compute_probabilities, compute_grid_offset, compute_trend_analysis
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ async def query_weather(
         HTTPException: 400 for invalid parameters, 500 for server errors
     """
     try:
+        from datetime import datetime
 
         # Extract request parameters
         lat = request.location.lat
@@ -54,6 +56,27 @@ async def query_weather(
         day = request.day_of_year.day
         start_year = request.historical_years.start_year
         end_year = request.historical_years.end_year
+
+        # Smart year selection: Adjust year range based on number of variables
+        # Single variable: use 5 years; Multiple variables: use 3 years
+        current_year = datetime.now().year
+        num_variables = len(request.variables)
+
+        # If user didn't specify custom years, apply smart defaults
+        # Check if using default years (1980 is the model default) or requesting too many years
+        if start_year == 1980 or (current_year - end_year <= 1 and end_year - start_year + 1 > 5):
+            if num_variables == 1:
+                # Single variable: fetch 5 years of data
+                max_years = 5
+                end_year = current_year - 1
+                start_year = end_year - (max_years - 1)
+                logger.info(f"Smart year selection: Single variable, using {max_years} years ({start_year}-{end_year})")
+            else:
+                # Multiple variables: fetch 3 years of data for faster response
+                max_years = 3
+                end_year = current_year - 1
+                start_year = end_year - (max_years - 1)
+                logger.info(f"Smart year selection: {num_variables} variables, using {max_years} years ({start_year}-{end_year}) for faster performance")
 
         logger.info(f"Processing query for {request.location.name or f'({lat}, {lon})'} on {month}/{day}")
 
@@ -71,6 +94,10 @@ async def query_weather(
                 if data["values"]:
                     # Compute statistics
                     stats = compute_statistics(data["values"])
+
+                    # Compute trend analysis
+                    trend_data = compute_trend_analysis(data["values"], data["years"])
+                    stats["trend"] = TrendAnalysis(**trend_data)
 
                     # Compute probabilities if thresholds provided
                     probs = {}
@@ -106,6 +133,10 @@ async def query_weather(
                 if data["values"]:
                     stats = compute_statistics(data["values"])
 
+                    # Compute trend analysis
+                    trend_data = compute_trend_analysis(data["values"], data["years"])
+                    stats["trend"] = TrendAnalysis(**trend_data)
+
                     probs = {}
                     if request.thresholds and variable in request.thresholds:
                         probs = compute_probabilities(data["values"], request.thresholds[variable])
@@ -136,6 +167,10 @@ async def query_weather(
                 if data["values"]:
                     stats = compute_statistics(data["values"])
 
+                    # Compute trend analysis
+                    trend_data = compute_trend_analysis(data["values"], data["years"])
+                    stats["trend"] = TrendAnalysis(**trend_data)
+
                     probs = {}
                     if request.thresholds and variable in request.thresholds:
                         probs = compute_probabilities(data["values"], request.thresholds[variable])
@@ -165,6 +200,10 @@ async def query_weather(
 
                 if data["values"]:
                     stats = compute_statistics(data["values"])
+
+                    # Compute trend analysis
+                    trend_data = compute_trend_analysis(data["values"], data["years"])
+                    stats["trend"] = TrendAnalysis(**trend_data)
 
                     probs = {}
                     if request.thresholds and variable in request.thresholds:

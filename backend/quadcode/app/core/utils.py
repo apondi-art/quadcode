@@ -114,6 +114,82 @@ def compute_probabilities(
     return probabilities
 
 
+def compute_trend_analysis(
+    values: List[float],
+    years: List[int]
+) -> Dict[str, Optional[float]]:
+    """
+    Compute trend analysis using linear regression.
+
+    Args:
+        values: List of numerical values
+        years: List of corresponding years
+
+    Returns:
+        Dictionary containing slope, intercept, r_squared, trend_direction, percent_change
+    """
+    if not values or not years or len(values) < 2:
+        logger.warning("Insufficient data for trend analysis")
+        return {
+            "slope": None,
+            "intercept": None,
+            "r_squared": None,
+            "trend_direction": None,
+            "percent_change": None
+        }
+
+    # Convert to numpy arrays and filter out NaN
+    arr_values = np.array(values, dtype=float)
+    arr_years = np.array(years, dtype=float)
+
+    # Filter out NaN values
+    valid_mask = ~np.isnan(arr_values)
+    valid_values = arr_values[valid_mask]
+    valid_years = arr_years[valid_mask]
+
+    if len(valid_values) < 2:
+        logger.warning("Insufficient valid data points for trend analysis")
+        return {
+            "slope": None,
+            "intercept": None,
+            "r_squared": None,
+            "trend_direction": None,
+            "percent_change": None
+        }
+
+    # Perform linear regression: y = mx + b
+    slope, intercept = np.polyfit(valid_years, valid_values, 1)
+
+    # Calculate R-squared
+    y_pred = slope * valid_years + intercept
+    ss_res = np.sum((valid_values - y_pred) ** 2)
+    ss_tot = np.sum((valid_values - np.mean(valid_values)) ** 2)
+    r_squared = 1 - (ss_res / ss_tot) if ss_tot != 0 else 0.0
+
+    # Determine trend direction
+    if abs(slope) < 0.01 or r_squared < 0.1:
+        trend_direction = "stable"
+    elif slope > 0:
+        trend_direction = "increasing"
+    else:
+        trend_direction = "decreasing"
+
+    # Calculate percent change from first to last year
+    first_value = valid_values[0]
+    last_value = valid_values[-1]
+    percent_change = ((last_value - first_value) / first_value * 100) if first_value != 0 else None
+
+    logger.info(f"Trend analysis: slope={slope:.4f}, r²={r_squared:.4f}, direction={trend_direction}")
+
+    return {
+        "slope": float(slope),
+        "intercept": float(intercept),
+        "r_squared": float(r_squared),
+        "trend_direction": trend_direction,
+        "percent_change": float(percent_change) if percent_change is not None else None
+    }
+
+
 def compute_grid_offset(
     requested_lat: float,
     requested_lon: float,
