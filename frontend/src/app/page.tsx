@@ -111,7 +111,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 py-6">
@@ -202,15 +202,6 @@ export default function Home() {
           </section>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <p className="text-center text-sm text-muted-foreground">
-            Powered by NASA EarthData | GPM IMERG & MERRA-2
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
