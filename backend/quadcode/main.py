@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 
-from app.api.v1.weather import router as weather_router
+from quadcode.app.api.v1.weather import router as weather_router
 
 # Configure logging
 logging.basicConfig(
@@ -27,7 +27,7 @@ app = FastAPI(
 # Configure CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React dev servers
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://localhost:5173"],  # Frontend dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
