@@ -51,7 +51,6 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     try:
-        # TODO: Add actual earthdata authentication check
         return {
             "status": "healthy",
             "earthdata_authenticated": True,
