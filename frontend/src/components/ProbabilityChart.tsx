@@ -46,60 +46,61 @@ export default function ProbabilityChart({ variableName, data, unit }: Probabili
 
   const histogramData = createHistogram();
 
+  const maxProb = Math.max(...histogramData.map(d => d.probability));
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Probability Distribution - {variableName}</CardTitle>
-        <CardDescription>
-          Historical distribution showing probability of different {variableName.toLowerCase()} ranges
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Probability Distribution - {variableName}</CardTitle>
+        <CardDescription className="text-xs">
+          Distribution of {variableName.toLowerCase()} values
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={histogramData}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+        <ResponsiveContainer width="100%" height={250}>
+          <BarChart data={histogramData} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}>
+            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" vertical={false} />
             <XAxis
               dataKey="range"
-              tick={{ fontSize: 12 }}
-              label={{ value: `${variableName} (${unit})`, position: 'insideBottom', offset: -5 }}
+              tick={{ fontSize: 10 }}
+              interval={0}
+              angle={-45}
+              textAnchor="end"
+              height={60}
             />
             <YAxis
-              tick={{ fontSize: 12 }}
-              label={{ value: 'Probability (%)', angle: -90, position: 'insideLeft' }}
+              tick={{ fontSize: 10 }}
+              domain={[0, Math.ceil(maxProb * 1.1)]}
+              label={{ value: 'Probability (%)', angle: -90, position: 'insideLeft', style: { fontSize: 10 } }}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px',
+                fontSize: '12px',
               }}
               formatter={(value: number) => [`${value.toFixed(1)}%`, 'Probability']}
             />
-            <ReferenceLine
-              x={data.statistics.mean}
-              stroke="hsl(var(--primary))"
-              strokeDasharray="3 3"
-              label="Mean"
-            />
-            <Bar dataKey="probability" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="probability" fill="#3b82f6" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-        <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+        <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <div>
             <p className="text-xs text-muted-foreground">Mean</p>
-            <p className="text-lg font-semibold">
+            <p className="text-sm font-semibold">
               {data.statistics.mean.toFixed(1)} {unit}
             </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Median</p>
-            <p className="text-lg font-semibold">
+            <p className="text-sm font-semibold">
               {data.statistics.median.toFixed(1)} {unit}
             </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">Std Dev</p>
-            <p className="text-lg font-semibold">
+            <p className="text-sm font-semibold">
               {data.statistics.std.toFixed(1)} {unit}
             </p>
           </div>

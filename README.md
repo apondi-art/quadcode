@@ -6,6 +6,11 @@ It is a web application that helps users explore the **likelihood of extreme wea
 ##  Features
 - Search for a location by name or select from an interactive map.
 - Choose a date (day of the year) to analyze.
+- **Multi-year trend analysis** with automatic year selection:
+  - 5-year historical data for single variable queries
+  - 3-year historical data for multiple variable queries (optimized for speed)
+  - Linear regression trend lines with R² correlation
+  - Percent change analysis over time periods
 - Select weather conditions of interest:
   - Very Hot
   - Very Cold
@@ -14,8 +19,11 @@ It is a web application that helps users explore the **likelihood of extreme wea
   - Very Uncomfortable (heat index / humidity).
 - View **probabilities** of these conditions based on historical data.
 - Visualize results with:
-  - Graphs (time series, probability distributions).
-  - Maps (heatmaps for conditions).
+  - **Multi-year trend charts** showing historical patterns and direction
+  - Time series graphs with actual values and trend lines
+  - Probability distributions and threshold analysis
+  - Interactive charts powered by Recharts and shadcn/ui
+- **Parallel data fetching** for improved performance
 - Download results in **JSON** or **CSV** format for further analysis.
 
 ##  Tech Stack
@@ -350,9 +358,27 @@ The API returns JSON with:
 
 ### Performance Notes
 
-- **Temperature & Precipitation**: Fast (~30-60 sec per year)
-- **Wind & Humidity**: Slower (~2-3 min per year) - uses hourly dataset with midday sampling
-- For faster queries, use shorter year ranges (e.g., 2022-2024 instead of 2000-2024)
+#### Query Speed Optimizations
+
+The API now includes **parallel data fetching** and **smart year selection** for optimal performance:
+
+- **Parallel Processing**: All years are fetched concurrently using `asyncio.gather()`, significantly reducing query time
+- **Smart Year Selection**:
+  - Single variable queries: Automatically uses 5 years of data
+  - Multiple variable queries: Automatically uses 3 years of data for faster responses
+  - Custom year ranges: You can override defaults by specifying `historical_years`
+
+#### Expected Response Times (with parallel fetching)
+
+- **Temperature & Precipitation (single variable, 5 years)**: ~1-2 minutes (vs. 2.5-5 min sequential)
+- **Wind & Humidity (single variable, 5 years)**: ~2-3 minutes (vs. 10-15 min sequential)
+- **Multiple variables (3 years)**: ~2-4 minutes total (all variables fetched in parallel)
+
+#### Performance Tips
+
+- Use default year ranges (don't specify `historical_years`) to benefit from smart selection
+- Query fewer variables when you need faster responses
+- Temperature and precipitation are faster than wind and humidity (different datasets)
 
 ### Troubleshooting
 

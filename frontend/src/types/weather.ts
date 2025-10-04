@@ -39,6 +39,14 @@ export interface WeatherQueryRequest {
   thresholds?: Thresholds;
 }
 
+export interface TrendAnalysis {
+  slope: number | null;
+  intercept: number | null;
+  r_squared: number | null;
+  trend_direction: 'increasing' | 'decreasing' | 'stable' | null;
+  percent_change: number | null;
+}
+
 export interface Statistics {
   mean: number;
   median: number;
@@ -50,6 +58,7 @@ export interface Statistics {
   percentile_10?: number;
   percentile_90?: number;
   count?: number;
+  trend?: TrendAnalysis;
 }
 
 export interface Probabilities {

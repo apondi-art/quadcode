@@ -88,6 +88,15 @@ class GridPoint(BaseModel):
     dataset: str
 
 
+class TrendAnalysis(BaseModel):
+    """Trend analysis data"""
+    slope: Optional[float] = Field(None, description="Linear regression slope (change per year)")
+    intercept: Optional[float] = Field(None, description="Linear regression intercept")
+    r_squared: Optional[float] = Field(None, description="R-squared value (0-1)")
+    trend_direction: Optional[str] = Field(None, description="'increasing', 'decreasing', or 'stable'")
+    percent_change: Optional[float] = Field(None, description="Percent change from first to last year")
+
+
 class Statistics(BaseModel):
     """Statistical measures"""
     mean: Optional[float]
@@ -100,6 +109,7 @@ class Statistics(BaseModel):
     percentile_75: Optional[float]
     percentile_90: Optional[float]
     count: int
+    trend: Optional[TrendAnalysis] = Field(None, description="Trend analysis over time")
 
 
 class VariableData(BaseModel):
