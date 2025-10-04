@@ -1,0 +1,37 @@
+services:
+  # Backend API Service
+  - type: web
+    name: quadcode-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: PORT
+        value: 8000
+      - key: FRONTEND_URL
+        # Update this to your frontend URL after deployment
+        value: https://quadcode-frontend.onrender.com
+      # Add your NASA Earthdata credentials as environment variables in Render dashboard
+      # - key: EARTHDATA_USERNAME
+      #   sync: false
+      # - key: EARTHDATA_PASSWORD
+      #   sync: false
+    healthCheckPath: /api/v1/health
+
+  # Frontend Service
+  - type: web
+    name: quadcode-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        # Update this to your backend service URL after deployment
+        value: https://quadcode-backend.onrender.com
+    buildCommand: npm run build
