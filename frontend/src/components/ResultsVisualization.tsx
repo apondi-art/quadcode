@@ -48,6 +48,19 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
   if (loading) {
     return (
       <div className="space-y-4">
+        {/* Loading Message */}
+        <Card className="border-l-4 border-primary bg-primary/5">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div>
+                <p className="text-base font-semibold text-primary">Analyzing Weather Data</p>
+                <p className="text-sm text-muted-foreground mt-1">Please be patient, this may take some time</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Loading Weather Forecast Summary */}
         <Card className="border-l-4 border-primary bg-muted/30">
           <CardHeader className="pb-3">
