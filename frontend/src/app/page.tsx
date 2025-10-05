@@ -135,7 +135,6 @@ export default function Home() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-medium mb-4">Location</h3>
                   <LocationSelector location={location} onLocationChange={setLocation} />
                 </div>
 
