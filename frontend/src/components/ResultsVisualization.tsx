@@ -187,25 +187,7 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
         </div>
       </div>
 
-      {/* Trend Analysis Charts - 2 columns on large screens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
-        {variables.map((variable) => {
-          const varData = data.historical_data[variable];
-          const unit = data.metadata.units[variable] || '';
-          const variableName = variable.charAt(0).toUpperCase() + variable.slice(1).replace('_', ' ');
-
-          return (
-            <TrendAnalysisChart
-              key={`trend-${variable}`}
-              variableName={variableName}
-              data={varData}
-              unit={unit}
-            />
-          );
-        })}
-      </div>
-
-      {/* Probability & Time Series Charts - 2 columns */}
+      {/* Row 1: Trend + Probability Charts - 2 columns */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {variables.map((variable) => {
           const varData = data.historical_data[variable];
@@ -213,16 +195,40 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
           const variableName = variable.charAt(0).toUpperCase() + variable.slice(1).replace('_', ' ');
 
           return (
-            <React.Fragment key={variable}>
-              <ProbabilityChart variableName={variableName} data={varData} unit={unit} />
-              <TimeSeriesChart variableName={variableName} data={varData} unit={unit} />
+            <React.Fragment key={`trend-prob-${variable}`}>
+              <TrendAnalysisChart
+                variableName={variableName}
+                data={varData}
+                unit={unit}
+              />
+              <ProbabilityChart
+                variableName={variableName}
+                data={varData}
+                unit={unit}
+              />
             </React.Fragment>
           );
         })}
       </div>
 
-      {/* Raw Statistics & Understanding Metrics - Full width row with 2 columns on large screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Row 2: Time Series + Raw Statistics - 2 columns */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Time Series Charts */}
+        {variables.map((variable) => {
+          const varData = data.historical_data[variable];
+          const unit = data.metadata.units[variable] || '';
+          const variableName = variable.charAt(0).toUpperCase() + variable.slice(1).replace('_', ' ');
+
+          return (
+            <TimeSeriesChart
+              key={`timeseries-${variable}`}
+              variableName={variableName}
+              data={varData}
+              unit={unit}
+            />
+          );
+        })}
+
         {/* Expandable Sortable Data Table */}
         <Card>
           <CardHeader className="cursor-pointer pb-3" onClick={() => setIsTableExpanded(!isTableExpanded)}>
@@ -279,35 +285,35 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
             </CardContent>
           )}
         </Card>
-
-        {/* Parameter Definitions */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">Understanding the Metrics</CardTitle>
-            <CardDescription className="text-xs">Parameter definitions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 text-xs">
-              <div className="border-l-4 border-blue-500 pl-2 py-1">
-                <p className="font-semibold">Mean</p>
-                <p className="text-muted-foreground">Typical value (average)</p>
-              </div>
-              <div className="border-l-4 border-yellow-500 pl-2 py-1">
-                <p className="font-semibold">Std Dev</p>
-                <p className="text-muted-foreground">Measure of variability</p>
-              </div>
-              <div className="border-l-4 border-red-500 pl-2 py-1">
-                <p className="font-semibold">Min/Max</p>
-                <p className="text-muted-foreground">Historical range</p>
-              </div>
-              <div className="border-l-4 border-orange-500 pl-2 py-1">
-                <p className="font-semibold">Trend</p>
-                <p className="text-muted-foreground">Linear regression (R² = correlation strength)</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Row 3: Understanding Metrics - Full width */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Understanding the Metrics</CardTitle>
+          <CardDescription className="text-xs">Parameter definitions</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+            <div className="border-l-4 border-blue-500 pl-2 py-1">
+              <p className="font-semibold">Mean</p>
+              <p className="text-muted-foreground">Typical value (average)</p>
+            </div>
+            <div className="border-l-4 border-yellow-500 pl-2 py-1">
+              <p className="font-semibold">Std Dev</p>
+              <p className="text-muted-foreground">Measure of variability</p>
+            </div>
+            <div className="border-l-4 border-red-500 pl-2 py-1">
+              <p className="font-semibold">Min/Max</p>
+              <p className="text-muted-foreground">Historical range</p>
+            </div>
+            <div className="border-l-4 border-orange-500 pl-2 py-1">
+              <p className="font-semibold">Trend</p>
+              <p className="text-muted-foreground">Linear regression (R² = correlation strength)</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
     </div>
   );
