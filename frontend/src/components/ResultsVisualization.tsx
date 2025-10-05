@@ -48,11 +48,24 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
   if (loading) {
     return (
       <div className="space-y-4">
+        {/* Loading Message */}
+        <Card className="border-l-4 border-primary bg-primary/5">
+          <CardContent className="pt-6 pb-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-3">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div>
+                <p className="text-base font-semibold text-primary">Analyzing Weather Data</p>
+                <p className="text-sm text-muted-foreground mt-1">Please be patient, this may take some time</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Loading Weather Forecast Summary */}
-        <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-background">
+        <Card className="border-l-4 border-primary bg-muted/30">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <CardTitle className="text-lg flex items-center gap-2 text-primary">
+              <Loader2 className="h-5 w-5 animate-spin" />
               Weather Forecast Summary
             </CardTitle>
             <CardDescription className="text-xs">Analyzing historical data...</CardDescription>
@@ -133,9 +146,9 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
       {/* Prediction Summary & Summary Cards - Stacked vertically */}
       <div className="space-y-4">
         {/* Prediction Summary */}
-        <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-background">
+        <Card className="border-l-4 border-primary bg-muted/30">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Weather Forecast Summary</CardTitle>
+            <CardTitle className="text-lg text-primary">Weather Forecast Summary</CardTitle>
             <CardDescription className="text-xs">{data.query_info.day_of_year} Prediction</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
@@ -163,13 +176,55 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
                 prediction = `will have moderate ${variableName.toLowerCase()}`;
               }
 
+              // Determine border color and background based on variable & value
+              let borderColor = 'border-l-primary';
+              let bgColor = 'bg-card';
+
+              if (variable === 'temperature') {
+                borderColor = 'border-l-accent';
+                // Hot = warm tint, Cold = cool tint
+                if (mean > 30) bgColor = 'bg-accent/10';
+                else if (mean < 10) bgColor = 'bg-primary/10';
+              } else if (variable === 'precipitation') {
+                borderColor = 'border-l-secondary';
+                // Wet = blue tint, Dry = neutral
+                if (mean > 10) bgColor = 'bg-secondary/10';
+              } else if (variable === 'humidity') {
+                borderColor = 'border-l-chart-3';
+                if (mean > 80) bgColor = 'bg-chart-3/10';
+              } else if (variable === 'wind_speed') {
+                borderColor = 'border-l-chart-4';
+                if (mean > 15) bgColor = 'bg-chart-4/10';
+              }
+
+              // Get icon based on variable and condition
+              let icon = '';
+              if (variable === 'temperature') {
+                icon = mean > 30 ? '🌡️' : mean < 10 ? '❄️' : '🌤️';
+              } else if (variable === 'precipitation') {
+                icon = mean > 10 ? '🌧️' : mean < 1 ? '☀️' : '⛅';
+              } else if (variable === 'humidity') {
+                icon = mean > 80 ? '💧' : '💨';
+              } else if (variable === 'wind_speed') {
+                icon = mean > 15 ? '💨' : '🍃';
+              }
+
               return (
-                <div key={variable} className="p-2 bg-card rounded-lg border">
-                  <p className="text-sm font-semibold">{data.query_info.day_of_year} {prediction}</p>
+                <div key={variable} className={`p-2 rounded-lg border-l-4 ${borderColor} ${bgColor} hover:shadow-md transition-all`}>
+                  <p className="text-sm font-semibold flex items-center gap-1">
+                    <span>{icon}</span>
+                    {data.query_info.day_of_year} {prediction}
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Expected: {mean.toFixed(1)} {unit}
                     {trend && trend.trend_direction && (
-                      <span className="ml-2">
+                      <span className={`ml-2 font-medium ${
+                        trend.trend_direction === 'increasing'
+                          ? 'text-accent'
+                          : trend.trend_direction === 'decreasing'
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
+                      }`}>
                         • {trend.trend_direction === 'increasing' ? '↗' : trend.trend_direction === 'decreasing' ? '↘' : '→'}
                         {' '}{Math.abs(trend.percent_change || 0).toFixed(1)}% {trend.trend_direction}
                       </span>
@@ -295,20 +350,20 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div className="border-l-4 border-blue-500 pl-2 py-1">
-              <p className="font-semibold">Mean</p>
+            <div className="border-l-4 border-primary pl-3 py-2 hover:bg-primary/5 transition-colors">
+              <p className="font-semibold text-primary">Mean</p>
               <p className="text-muted-foreground">Typical value (average)</p>
             </div>
-            <div className="border-l-4 border-yellow-500 pl-2 py-1">
-              <p className="font-semibold">Std Dev</p>
+            <div className="border-l-4 border-warning pl-3 py-2 hover:bg-warning/5 transition-colors">
+              <p className="font-semibold text-warning">Std Dev</p>
               <p className="text-muted-foreground">Measure of variability</p>
             </div>
-            <div className="border-l-4 border-red-500 pl-2 py-1">
-              <p className="font-semibold">Min/Max</p>
+            <div className="border-l-4 border-accent pl-3 py-2 hover:bg-accent/5 transition-colors">
+              <p className="font-semibold text-accent">Min/Max</p>
               <p className="text-muted-foreground">Historical range</p>
             </div>
-            <div className="border-l-4 border-orange-500 pl-2 py-1">
-              <p className="font-semibold">Trend</p>
+            <div className="border-l-4 border-secondary pl-3 py-2 hover:bg-secondary/5 transition-colors">
+              <p className="font-semibold text-secondary">Trend</p>
               <p className="text-muted-foreground">Linear regression (R² = correlation strength)</p>
             </div>
           </div>

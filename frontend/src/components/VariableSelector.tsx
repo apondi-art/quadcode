@@ -38,7 +38,7 @@ export default function VariableSelector({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weather Variables</CardTitle>
+        <CardTitle className="text-primary">Weather Variables</CardTitle>
         <CardDescription>Select the weather parameters to analyze</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

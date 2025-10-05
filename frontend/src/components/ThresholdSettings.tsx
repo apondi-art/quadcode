@@ -33,7 +33,7 @@ export default function ThresholdSettings({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Threshold Settings</CardTitle>
+        <CardTitle className="text-primary">Threshold Settings</CardTitle>
         <CardDescription>Define thresholds for extreme conditions</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

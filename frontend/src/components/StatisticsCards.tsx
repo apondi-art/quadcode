@@ -37,16 +37,52 @@ export default function StatisticsCards({ data }: StatisticsCardsProps) {
 
   // Calculate best conditions probability (simplified)
   const getBestConditionsProbability = () => {
-    if (!firstVarData) return 0;
-    // Simple heuristic: probability within 1 std dev of mean
-    return 68; // Normal distribution approximation
+    if (!firstVarData || !firstVarData.values || firstVarData.values.length === 0) return 0;
+
+    // Calculate probability within 1 std dev of mean using actual historical data
+    const { mean, std } = firstVarData.statistics;
+    const lowerBound = mean - std;
+    const upperBound = mean + std;
+
+    // Count values within 1 std dev
+    const withinRange = firstVarData.values.filter(
+      v => v >= lowerBound && v <= upperBound
+    ).length;
+
+    return Math.round((withinRange / firstVarData.values.length) * 100);
   };
 
   // Get extreme weather probability
   const getExtremeWeatherProbability = () => {
-    if (!firstVarData?.probabilities) return 0;
-    const probs = Object.values(firstVarData.probabilities);
-    return Math.max(...probs) * 100;
+    // First try to get from threshold probabilities if available
+    if (firstVarData?.probabilities && Object.keys(firstVarData.probabilities).length > 0) {
+      const probs = Object.values(firstVarData.probabilities);
+      return Math.round(Math.max(...probs) * 100);
+    }
+
+    // Fallback: Calculate extreme weather as values in outer quartiles (beyond 1.5 std dev)
+    if (!firstVarData || !firstVarData.values || firstVarData.values.length === 0) return 0;
+
+    const { mean, std, percentile_10, percentile_90 } = firstVarData.statistics;
+
+    // Use 10th and 90th percentiles if available, otherwise use 1.5 std dev
+    let extremeCount = 0;
+
+    if (percentile_10 !== undefined && percentile_90 !== undefined) {
+      // Count values in outer 20% (below 10th or above 90th percentile)
+      extremeCount = firstVarData.values.filter(
+        v => v < percentile_10 || v > percentile_90
+      ).length;
+    } else {
+      // Fallback: use 1.5 standard deviations
+      const lowerBound = mean - (1.5 * std);
+      const upperBound = mean + (1.5 * std);
+      extremeCount = firstVarData.values.filter(
+        v => v < lowerBound || v > upperBound
+      ).length;
+    }
+
+    return Math.round((extremeCount / firstVarData.values.length) * 100);
   };
 
   // Calculate trend
