@@ -62,18 +62,7 @@ async def root():
 @app.get("/api/v1/health")
 async def health_check():
     """Health check endpoint"""
-    try:
-        return {
-            "status": "healthy",
-            "earthdata_authenticated": True,
-            "datasets_accessible": ["GPM_3IMERGDF", "M2SDNXSLV"]
-        }
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return {
-            "status": "unhealthy",
-            "error": str(e)
-        }
+    return {"status": "ok"}
 
 
 if __name__ == "__main__":
