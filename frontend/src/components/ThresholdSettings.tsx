@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Thresholds } from '@/types/weather';
 
 interface ThresholdSettingsProps {
@@ -41,34 +42,42 @@ export default function ThresholdSettings({
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Temperature Thresholds</h4>
             <div className="space-y-3">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label className="text-xs">Very Hot (&gt;)</Label>
-                  <span className="text-xs font-medium">{thresholds.temperature?.hot || 35}°C</span>
-                </div>
-                <Slider
-                  min={25}
-                  max={45}
-                  step={1}
-                  value={[thresholds.temperature?.hot || 35]}
-                  onValueChange={(val) => updateThreshold('temperature', 'hot', val[0])}
-                  className="w-full"
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label className="text-xs">Very Cold (&lt;)</Label>
-                  <span className="text-xs font-medium">{thresholds.temperature?.cold || 5}°C</span>
-                </div>
-                <Slider
-                  min={-10}
-                  max={15}
-                  step={1}
-                  value={[thresholds.temperature?.cold || 5]}
-                  onValueChange={(val) => updateThreshold('temperature', 'cold', val[0])}
-                  className="w-full"
-                />
-              </div>
+               <div className="space-y-2">
+                 <Label className="text-xs">Very Hot (&gt;)</Label>
+                 <Select
+                   value={String(thresholds.temperature?.hot || 35)}
+                   onValueChange={(val) => updateThreshold('temperature', 'hot', Number(val))}
+                 >
+                   <SelectTrigger className="w-full">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {Array.from({ length: 21 }, (_, i) => 25 + i).map((val) => (
+                       <SelectItem key={val} value={String(val)}>
+                         {val}°C
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="space-y-2">
+                 <Label className="text-xs">Very Cold (&lt;)</Label>
+                 <Select
+                   value={String(thresholds.temperature?.cold || 5)}
+                   onValueChange={(val) => updateThreshold('temperature', 'cold', Number(val))}
+                 >
+                   <SelectTrigger className="w-full">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {Array.from({ length: 26 }, (_, i) => -10 + i).map((val) => (
+                       <SelectItem key={val} value={String(val)}>
+                         {val}°C
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
             </div>
           </div>
         )}
@@ -76,40 +85,48 @@ export default function ThresholdSettings({
         {selectedVariables.includes('precipitation') && (
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Precipitation Thresholds</h4>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label className="text-xs">Very Wet (&gt;)</Label>
-                <span className="text-xs font-medium">{thresholds.precipitation?.wet || 50} mm</span>
-              </div>
-              <Slider
-                min={10}
-                max={200}
-                step={10}
-                value={[thresholds.precipitation?.wet || 50]}
-                onValueChange={(val) => updateThreshold('precipitation', 'wet', val[0])}
-                className="w-full"
-              />
-            </div>
+             <div className="space-y-2">
+               <Label className="text-xs">Very Wet (&gt;)</Label>
+               <Select
+                 value={String(thresholds.precipitation?.wet || 50)}
+                 onValueChange={(val) => updateThreshold('precipitation', 'wet', Number(val))}
+               >
+                 <SelectTrigger className="w-full">
+                   <SelectValue />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {Array.from({ length: 20 }, (_, i) => 10 + i * 10).map((val) => (
+                     <SelectItem key={val} value={String(val)}>
+                       {val} mm
+                     </SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+             </div>
           </div>
         )}
 
         {selectedVariables.includes('wind_speed') && (
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Wind Speed Thresholds</h4>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label className="text-xs">Very Windy (&gt;)</Label>
-                <span className="text-xs font-medium">{thresholds.wind_speed?.windy || 40} m/s</span>
-              </div>
-              <Slider
-                min={10}
-                max={100}
-                step={5}
-                value={[thresholds.wind_speed?.windy || 40]}
-                onValueChange={(val) => updateThreshold('wind_speed', 'windy', val[0])}
-                className="w-full"
-              />
-            </div>
+             <div className="space-y-2">
+               <Label className="text-xs">Very Windy (&gt;)</Label>
+               <Select
+                 value={String(thresholds.wind_speed?.windy || 40)}
+                 onValueChange={(val) => updateThreshold('wind_speed', 'windy', Number(val))}
+               >
+                 <SelectTrigger className="w-full">
+                   <SelectValue />
+                 </SelectTrigger>
+                 <SelectContent>
+                   {Array.from({ length: 19 }, (_, i) => 10 + i * 5).map((val) => (
+                     <SelectItem key={val} value={String(val)}>
+                       {val} m/s
+                     </SelectItem>
+                   ))}
+                 </SelectContent>
+               </Select>
+             </div>
           </div>
         )}
 
@@ -117,34 +134,42 @@ export default function ThresholdSettings({
           <div className="space-y-4">
             <h4 className="text-sm font-medium">Humidity Thresholds</h4>
             <div className="space-y-3">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label className="text-xs">Very High (&gt;)</Label>
-                  <span className="text-xs font-medium">{thresholds.humidity?.high || 80}%</span>
-                </div>
-                <Slider
-                  min={60}
-                  max={100}
-                  step={5}
-                  value={[thresholds.humidity?.high || 80]}
-                  onValueChange={(val) => updateThreshold('humidity', 'high', val[0])}
-                  className="w-full"
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label className="text-xs">Very Low (&lt;)</Label>
-                  <span className="text-xs font-medium">{thresholds.humidity?.low || 20}%</span>
-                </div>
-                <Slider
-                  min={0}
-                  max={40}
-                  step={5}
-                  value={[thresholds.humidity?.low || 20]}
-                  onValueChange={(val) => updateThreshold('humidity', 'low', val[0])}
-                  className="w-full"
-                />
-              </div>
+               <div className="space-y-2">
+                 <Label className="text-xs">Very High (&gt;)</Label>
+                 <Select
+                   value={String(thresholds.humidity?.high || 80)}
+                   onValueChange={(val) => updateThreshold('humidity', 'high', Number(val))}
+                 >
+                   <SelectTrigger className="w-full">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {Array.from({ length: 9 }, (_, i) => 60 + i * 5).map((val) => (
+                       <SelectItem key={val} value={String(val)}>
+                         {val}%
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="space-y-2">
+                 <Label className="text-xs">Very Low (&lt;)</Label>
+                 <Select
+                   value={String(thresholds.humidity?.low || 20)}
+                   onValueChange={(val) => updateThreshold('humidity', 'low', Number(val))}
+                 >
+                   <SelectTrigger className="w-full">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     {Array.from({ length: 9 }, (_, i) => i * 5).map((val) => (
+                       <SelectItem key={val} value={String(val)}>
+                         {val}%
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
             </div>
           </div>
         )}
