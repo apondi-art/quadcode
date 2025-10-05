@@ -163,16 +163,45 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
                 prediction = `will have moderate ${variableName.toLowerCase()}`;
               }
 
-              // Determine border color based on variable type
+              // Determine border color and background based on variable & value
               let borderColor = 'border-l-primary';
-              if (variable === 'temperature') borderColor = 'border-l-accent';
-              else if (variable === 'precipitation') borderColor = 'border-l-secondary';
-              else if (variable === 'humidity') borderColor = 'border-l-chart-3';
-              else if (variable === 'wind_speed') borderColor = 'border-l-chart-4';
+              let bgColor = 'bg-card';
+
+              if (variable === 'temperature') {
+                borderColor = 'border-l-accent';
+                // Hot = warm tint, Cold = cool tint
+                if (mean > 30) bgColor = 'bg-accent/10';
+                else if (mean < 10) bgColor = 'bg-primary/10';
+              } else if (variable === 'precipitation') {
+                borderColor = 'border-l-secondary';
+                // Wet = blue tint, Dry = neutral
+                if (mean > 10) bgColor = 'bg-secondary/10';
+              } else if (variable === 'humidity') {
+                borderColor = 'border-l-chart-3';
+                if (mean > 80) bgColor = 'bg-chart-3/10';
+              } else if (variable === 'wind_speed') {
+                borderColor = 'border-l-chart-4';
+                if (mean > 15) bgColor = 'bg-chart-4/10';
+              }
+
+              // Get icon based on variable and condition
+              let icon = '';
+              if (variable === 'temperature') {
+                icon = mean > 30 ? '🌡️' : mean < 10 ? '❄️' : '🌤️';
+              } else if (variable === 'precipitation') {
+                icon = mean > 10 ? '🌧️' : mean < 1 ? '☀️' : '⛅';
+              } else if (variable === 'humidity') {
+                icon = mean > 80 ? '💧' : '💨';
+              } else if (variable === 'wind_speed') {
+                icon = mean > 15 ? '💨' : '🍃';
+              }
 
               return (
-                <div key={variable} className={`p-2 bg-card rounded-lg border-l-4 ${borderColor} hover:shadow-sm transition-shadow`}>
-                  <p className="text-sm font-semibold">{data.query_info.day_of_year} {prediction}</p>
+                <div key={variable} className={`p-2 rounded-lg border-l-4 ${borderColor} ${bgColor} hover:shadow-md transition-all`}>
+                  <p className="text-sm font-semibold flex items-center gap-1">
+                    <span>{icon}</span>
+                    {data.query_info.day_of_year} {prediction}
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Expected: {mean.toFixed(1)} {unit}
                     {trend && trend.trend_direction && (
