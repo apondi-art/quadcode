@@ -131,7 +131,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[480px_1fr] gap-8">
           {/* Query Panel - Left Sidebar */}
           <aside className="space-y-6">
             <Card>
