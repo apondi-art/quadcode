@@ -136,7 +136,7 @@ export default function Home() {
           <aside className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Query Parameters</CardTitle>
+                <CardTitle className="text-primary">Query Parameters</CardTitle>
                 <CardDescription>Configure your weather analysis</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
