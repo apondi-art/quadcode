@@ -51,7 +51,7 @@ export default function Footer() {
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 Weather Explorer. All rights reserved.
+            © 2025 Weather Explorer. All rights reserved.
           </p>
         </div>
       </div>
