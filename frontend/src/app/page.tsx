@@ -15,14 +15,17 @@ import { Download, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [location, setLocation] = useState<Location>({
-    lat: -0.4197,
-    lon: 36.9489,
-    name: 'Nyeri, Kenya',
+    lat: 0,
+    lon: 0,
+    name: '',
   });
 
-  const [dayOfYear, setDayOfYear] = useState<DayOfYear>({
-    month: 8,
-    day: 3,
+  const [dayOfYear, setDayOfYear] = useState<DayOfYear>(() => {
+    const today = new Date();
+    return {
+      month: today.getMonth() + 1, // getMonth() returns 0-11
+      day: today.getDate(),
+    };
   });
 
   const [selectedVariables, setSelectedVariables] = useState<string[]>(['temperature', 'precipitation']);
@@ -48,12 +51,13 @@ export default function Home() {
     setError(null);
 
     try {
+      const currentYear = new Date().getFullYear();
       const response = await WeatherAPI.queryWeather({
         location,
         day_of_year: dayOfYear,
         historical_years: {
-          start_year: 2019,
-          end_year: 2024,
+          start_year: currentYear - 5, // Last 5 years
+          end_year: currentYear - 1,    // Up to last year
         },
         variables: selectedVariables,
         thresholds,
@@ -68,8 +72,9 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    setLocation({ lat: -0.4197, lon: 36.9489, name: 'Nyeri, Kenya' });
-    setDayOfYear({ month: 8, day: 3 });
+    const today = new Date();
+    setLocation({ lat: 0, lon: 0, name: '' });
+    setDayOfYear({ month: today.getMonth() + 1, day: today.getDate() });
     setSelectedVariables(['temperature', 'precipitation']);
     setThresholds({
       temperature: { hot: 35, cold: 5 },
@@ -85,11 +90,12 @@ export default function Home() {
     if (!results) return;
 
     try {
+      const currentYear = new Date().getFullYear();
       const blob = await WeatherAPI.downloadData(
         {
           location,
           day_of_year: dayOfYear,
-          historical_years: { start_year: 2019, end_year: 2024 },
+          historical_years: { start_year: currentYear - 5, end_year: currentYear - 1 },
           variables: selectedVariables,
           thresholds,
         },
