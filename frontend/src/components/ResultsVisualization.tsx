@@ -187,8 +187,8 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
         </div>
       </div>
 
-      {/* Trend Analysis Charts - Full width grid */}
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 auto-rows-fr">
+      {/* Trend Analysis Charts - 2 columns on large screens */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 auto-rows-fr">
         {variables.map((variable) => {
           const varData = data.historical_data[variable];
           const unit = data.metadata.units[variable] || '';
@@ -205,8 +205,8 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
         })}
       </div>
 
-      {/* All Charts - Compact grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Probability & Time Series Charts - 2 columns */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {variables.map((variable) => {
           const varData = data.historical_data[variable];
           const unit = data.metadata.units[variable] || '';
@@ -221,7 +221,7 @@ export default function ResultsVisualization({ data, loading }: ResultsVisualiza
         })}
       </div>
 
-      {/* Compact Data Table & Metrics - Side by side */}
+      {/* Raw Statistics & Understanding Metrics - Full width row with 2 columns on large screens */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Expandable Sortable Data Table */}
         <Card>
