@@ -6,7 +6,7 @@ export default function Navbar() {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold">Logo</div>
+          <div className="text-2xl font-bold">QUADCODE</div>
           <div className="hidden md:flex space-x-6">
             <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
               Home
