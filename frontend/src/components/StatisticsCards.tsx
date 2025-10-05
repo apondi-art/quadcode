@@ -60,17 +60,27 @@ export default function StatisticsCards({ data }: StatisticsCardsProps) {
       return Math.round(Math.max(...probs) * 100);
     }
 
-    // Fallback: Calculate extreme weather as values beyond 2 std deviations
+    // Fallback: Calculate extreme weather as values in outer quartiles (beyond 1.5 std dev)
     if (!firstVarData || !firstVarData.values || firstVarData.values.length === 0) return 0;
 
-    const { mean, std } = firstVarData.statistics;
-    const lowerBound = mean - (2 * std);
-    const upperBound = mean + (2 * std);
+    const { mean, std, percentile_10, percentile_90 } = firstVarData.statistics;
 
-    // Count values outside 2 std dev (extreme values)
-    const extremeCount = firstVarData.values.filter(
-      v => v < lowerBound || v > upperBound
-    ).length;
+    // Use 10th and 90th percentiles if available, otherwise use 1.5 std dev
+    let extremeCount = 0;
+
+    if (percentile_10 !== undefined && percentile_90 !== undefined) {
+      // Count values in outer 20% (below 10th or above 90th percentile)
+      extremeCount = firstVarData.values.filter(
+        v => v < percentile_10 || v > percentile_90
+      ).length;
+    } else {
+      // Fallback: use 1.5 standard deviations
+      const lowerBound = mean - (1.5 * std);
+      const upperBound = mean + (1.5 * std);
+      extremeCount = firstVarData.values.filter(
+        v => v < lowerBound || v > upperBound
+      ).length;
+    }
 
     return Math.round((extremeCount / firstVarData.values.length) * 100);
   };
