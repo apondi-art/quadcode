@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { DayOfYear } from '@/types/weather';
 
 interface DayOfYearPickerProps {
@@ -47,8 +46,8 @@ export default function DayOfYearPicker({ dayOfYear, onDayOfYearChange }: DayOfY
     onDayOfYearChange({ month: newMonth, day: newDay });
   };
 
-  const handleDayChange = (value: number[]) => {
-    onDayOfYearChange({ ...dayOfYear, day: value[0] });
+  const handleDayChange = (dayValue: string) => {
+    onDayOfYearChange({ ...dayOfYear, day: parseInt(dayValue) });
   };
 
   // Generate years (current year + 10 years)
@@ -88,24 +87,20 @@ export default function DayOfYearPicker({ dayOfYear, onDayOfYearChange }: DayOfY
         </Select>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Label htmlFor="day-slider">Day</Label>
-          <span className="text-2xl font-bold text-primary">{dayOfYear.day}</span>
-        </div>
-        <Slider
-          id="day-slider"
-          min={1}
-          max={maxDays}
-          step={1}
-          value={[dayOfYear.day]}
-          onValueChange={handleDayChange}
-          className="w-full"
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>1</span>
-          <span>{maxDays}</span>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="day-select">Day</Label>
+        <Select value={dayOfYear.day.toString()} onValueChange={handleDayChange}>
+          <SelectTrigger id="day-select">
+            <SelectValue placeholder="Select day" />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: maxDays }, (_, i) => i + 1).map((day) => (
+              <SelectItem key={day} value={day.toString()}>
+                {day}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="p-3 bg-muted rounded-md text-center">
