@@ -37,16 +37,42 @@ export default function StatisticsCards({ data }: StatisticsCardsProps) {
 
   // Calculate best conditions probability (simplified)
   const getBestConditionsProbability = () => {
-    if (!firstVarData) return 0;
-    // Simple heuristic: probability within 1 std dev of mean
-    return 68; // Normal distribution approximation
+    if (!firstVarData || !firstVarData.values || firstVarData.values.length === 0) return 0;
+
+    // Calculate probability within 1 std dev of mean using actual historical data
+    const { mean, std } = firstVarData.statistics;
+    const lowerBound = mean - std;
+    const upperBound = mean + std;
+
+    // Count values within 1 std dev
+    const withinRange = firstVarData.values.filter(
+      v => v >= lowerBound && v <= upperBound
+    ).length;
+
+    return Math.round((withinRange / firstVarData.values.length) * 100);
   };
 
   // Get extreme weather probability
   const getExtremeWeatherProbability = () => {
-    if (!firstVarData?.probabilities) return 0;
-    const probs = Object.values(firstVarData.probabilities);
-    return Math.max(...probs) * 100;
+    // First try to get from threshold probabilities if available
+    if (firstVarData?.probabilities && Object.keys(firstVarData.probabilities).length > 0) {
+      const probs = Object.values(firstVarData.probabilities);
+      return Math.round(Math.max(...probs) * 100);
+    }
+
+    // Fallback: Calculate extreme weather as values beyond 2 std deviations
+    if (!firstVarData || !firstVarData.values || firstVarData.values.length === 0) return 0;
+
+    const { mean, std } = firstVarData.statistics;
+    const lowerBound = mean - (2 * std);
+    const upperBound = mean + (2 * std);
+
+    // Count values outside 2 std dev (extreme values)
+    const extremeCount = firstVarData.values.filter(
+      v => v < lowerBound || v > upperBound
+    ).length;
+
+    return Math.round((extremeCount / firstVarData.values.length) * 100);
   };
 
   // Calculate trend
